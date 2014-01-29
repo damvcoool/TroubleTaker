@@ -8,7 +8,7 @@ using namespace gameplay;
 /**
  * Main game class.
  */
-class TroubleTaker: public Game
+class TroubleTaker: public Game,Control::Listener
 {
 public:
 
@@ -21,11 +21,16 @@ public:
      * @see Game::keyEvent
      */
 	void keyEvent(Keyboard::KeyEvent evt, int key);
-	
+
     /**
      * @see Game::touchEvent
      */
     void touchEvent(Touch::TouchEvent evt, int x, int y, unsigned int contactIndex);
+
+    void controlEvent(Control *control, EventType evt);
+
+    /*We are not using this yet*/
+    bool checkScene(Node* node, Ray* ray);
 
 protected:
 
@@ -58,6 +63,34 @@ private:
 
     Scene* _scene;
     bool _wireframe;
+
+
+
+    /**
+             * Currently selected node (or NULL)
+             */
+            Node* _selected;
+
+            /**
+               * Sidebar Form
+               */
+        	  Form* _form;
+
+      /**
+       * Form References
+       */
+        Button* _bPlayAll;
+        Button* _rightPunch;
+
+        //Just for the prototype
+       Font* _font;
+       Font*_fontWinnerMessage;
+
+       int bloodPlayer;
+       int bloodEnemy;
+
+       AudioSource* wheelsSound;
+       int counter;
 };
 
 #endif

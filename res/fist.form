@@ -1,0 +1,29 @@
+form sceneSettings
+{
+    // Form properties.
+	theme = res/fist.theme
+    autoWidth = true
+    autoHeight = true
+    consumeInputEvents = false
+
+    // All the Controls within this Form.
+    button playAll
+   {
+	  consumeInputEvents = true
+	  style = buttonStyle
+	  width = 84
+	  height = 120
+	 position = 100, 1000
+	  text = Play all
+   }
+   
+    button rightPunch
+   {
+	  consumeInputEvents = true
+	  style = buttonStyle
+	  width = 84
+	  height = 120
+	 position = 620, 1000
+	  text = Right Punch
+   }
+}

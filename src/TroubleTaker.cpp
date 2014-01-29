@@ -4,7 +4,7 @@
 TroubleTaker game;
 
 TroubleTaker::TroubleTaker()
-    : _scene(NULL), _wireframe(false)
+    : _scene(NULL), _wireframe(false), _bPlayAll(NULL), _form(NULL),_selected(NULL),_rightPunch(NULL)
 {
 }
 
@@ -20,10 +20,30 @@ void TroubleTaker::initialize()
 
     // Set the aspect ratio for the scene's camera to match the current resolution
     _scene->getActiveCamera()->setAspectRatio(getAspectRatio());
+
+
+    //For prototype
+	wheelsSound = AudioSource::create("res/IntroEyeoftheTiger1.wav");
+
+	bloodPlayer=10;
+	bloodEnemy=10;
+	_font = Font::create("res/ui/arial.gpb");
+	_fontWinnerMessage= Font::create("res/ui/arial.gpb");
+	counter=0;
+
+
+	_form = Form::create("res/fist.form");
+
+	_bPlayAll = (Button *)_form->getControl("playAll");
+	_rightPunch = (Button *)_form->getControl("rightPunch");
+
+	_bPlayAll->addListener(this, Listener::CLICK);
+	_rightPunch->addListener(this, Listener::CLICK);
 }
 
 void TroubleTaker::finalize()
 {
+	SAFE_RELEASE(_form);
     SAFE_RELEASE(_scene);
 }
 
@@ -40,12 +60,37 @@ void TroubleTaker::render(float elapsedTime)
 
     // Visit all the nodes in the scene for drawing
     _scene->visit(this, &TroubleTaker::drawScene);
+
+
+
+
+    //For Prototype
+
+    _form->draw();
+
+       	// Draw the text at position 20,20 using red color
+       	_font->start();
+       	char text[1024];
+       	char text3[1024];
+       	sprintf(text, "Blood player:%d	Blood enemy:%d ",bloodPlayer, bloodEnemy);
+       	//sprintf(text, "Elkin ");
+       	_font->drawText(text, 5, 20, Vector4(1, 0, 0, 1), _font->getSize());
+       	_font->finish();
+
+       	if(bloodEnemy<=0){
+
+       		_fontWinnerMessage->start();
+       		char text2[1024];
+       		sprintf(text2, "The winner is player!!!!");
+       		_fontWinnerMessage->drawText(text2, 10, 50, Vector4(1, 0, 0, 1), _fontWinnerMessage->getSize());
+       		_fontWinnerMessage->finish();
+       	}
 }
 
 bool TroubleTaker::drawScene(Node* node)
 {
     // If the node visited contains a model, draw it
-    Model* model = node->getModel(); 
+    Model* model = node->getModel();
     if (model)
     {
         model->draw(_wireframe);
@@ -78,4 +123,29 @@ void TroubleTaker::touchEvent(Touch::TouchEvent evt, int x, int y, unsigned int 
     case Touch::TOUCH_MOVE:
         break;
     };
+}
+
+
+void TroubleTaker::controlEvent(Control *control, EventType evt) {
+   switch(evt) {
+   case Listener::CLICK:
+      if (control==_bPlayAll) {
+    	  bloodEnemy--;
+    	  counter++;
+         //_scene->visit(this, &SceneViewer::startAnims);
+      }
+      if (control==_rightPunch) {
+    	  bloodPlayer--;
+    	  counter++;
+         //_scene->visit(this, &SceneViewer::startAnims);
+      }
+      //if (control==_bPlaySelected) {
+         //this->playNodeAmination(_selected);
+      //}
+      break;
+   }
+
+   if(counter==15){
+       wheelsSound->play();
+   }
 }
