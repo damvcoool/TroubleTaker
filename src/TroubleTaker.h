@@ -60,6 +60,8 @@ private:
      * Draws the scene each frame.
      */
     bool drawScene(Node* node);
+    bool initializeScene(Node* node);
+    void initializeMaterial(Scene* scene, Node* node, Material* material);
 
     Scene* _scene;
     bool _wireframe;
@@ -91,6 +93,9 @@ private:
 
        AudioSource* wheelsSound;
        int counter;
+       Animation *animation;
+       AnimationClip *idle;
+       AnimationClip *walk;
 };
 
 #endif

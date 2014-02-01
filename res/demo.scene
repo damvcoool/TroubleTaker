@@ -1,12 +1,11 @@
 scene
 {
-    path = res/demo.gpb
-
+    path = res/demo.gpb   
     ambientColor = 1, 1, 1
 
     node box
     {
-        material = res/demo.material#lambert2
+    	material = res/demo.material#lambert2
     }
 
     physics

@@ -11,16 +11,11 @@ TroubleTaker::TroubleTaker()
 void TroubleTaker::initialize()
 {
     // Load game scene from file
+	//Bundle* bundle = Bundle::create("res/scene.gpb");
     _scene = Scene::load("res/demo.scene");
-
-    // Get the box model and initialize its material parameter values and bindings
-    Node* boxNode = _scene->findNode("box");
-    Model* boxModel = boxNode->getModel();
-    Material* boxMaterial = boxModel->getMaterial();
 
     // Set the aspect ratio for the scene's camera to match the current resolution
     _scene->getActiveCamera()->setAspectRatio(getAspectRatio());
-
 
     //For prototype
 	wheelsSound = AudioSource::create("res/IntroEyeoftheTiger1.wav");
@@ -31,7 +26,6 @@ void TroubleTaker::initialize()
 	_fontWinnerMessage= Font::create("res/ui/arial.gpb");
 	counter=0;
 
-
 	_form = Form::create("res/fist.form");
 
 	_bPlayAll = (Button *)_form->getControl("playAll");
@@ -39,6 +33,46 @@ void TroubleTaker::initialize()
 
 	_bPlayAll->addListener(this, Listener::CLICK);
 	_rightPunch->addListener(this, Listener::CLICK);
+
+	/*
+	animation = boxNode->getAnimation("animations");
+	animation->createClips("res/player.animation");
+	idle = animation->getClip("idle");
+	walk = animation->getClip("walk");
+	AnimationClip* clip = animation->getClip("walk");
+	// Set clip properties
+	clip->setSpeed(0.5f);
+	clip->setRepeatCount(AnimationClip::REPEAT_INDEFINITE);
+	clip->play();
+	*/
+
+    _scene->visit(this, &TroubleTaker::initializeScene);
+}
+
+bool TroubleTaker::initializeScene(Node* node)
+{
+    Model* model = node->getModel();
+    if (model && model->getMaterial())
+    {
+        initializeMaterial(_scene, node, model->getMaterial());
+    }
+
+    return true;
+}
+
+void TroubleTaker::initializeMaterial(Scene* scene, Node* node, Material* material)
+{
+    // Bind light shader parameters to dynamic objects only
+    if (node->hasTag("dynamic"))
+    {
+        material->getParameter("u_ambientColor")->bindValue(scene, &Scene::getAmbientColor);
+        Node* lightNode = scene->findNode("sun");
+        if (lightNode)
+        {
+            material->getParameter("u_directionalLightColor[0]")->bindValue(lightNode->getLight(), &Light::getColor);
+            material->getParameter("u_directionalLightDirection[0]")->bindValue(lightNode, &Node::getForwardVectorView);
+        }
+    }
 }
 
 void TroubleTaker::finalize()
@@ -50,19 +84,13 @@ void TroubleTaker::finalize()
 void TroubleTaker::update(float elapsedTime)
 {
     // Rotate model
-    _scene->findNode("box")->rotateY(MATH_DEG_TO_RAD((float)elapsedTime / 1000.0f * 180.0f));
+    //_scene->findNode("Cube")->rotateY(MATH_DEG_TO_RAD((float)elapsedTime / 1000.0f * 180.0f));
 }
 
 void TroubleTaker::render(float elapsedTime)
 {
     // Clear the color and depth buffers
     clear(CLEAR_COLOR_DEPTH, Vector4::zero(), 1.0f, 0);
-
-    // Visit all the nodes in the scene for drawing
-    _scene->visit(this, &TroubleTaker::drawScene);
-
-
-
 
     //For Prototype
 
@@ -85,6 +113,9 @@ void TroubleTaker::render(float elapsedTime)
        		_fontWinnerMessage->drawText(text2, 10, 50, Vector4(1, 0, 0, 1), _fontWinnerMessage->getSize());
        		_fontWinnerMessage->finish();
        	}
+        // Visit all the nodes in the scene for drawing
+
+        _scene->visit(this, &TroubleTaker::drawScene);
 }
 
 bool TroubleTaker::drawScene(Node* node)
